@@ -56,8 +56,9 @@ def find_duplicates(files):
 def remove_duplicates(duplicates, keeper):
     removed_files = []
     for hash, files in duplicates.items():
+        is_in_keeper = any(map(lambda f: f.startswith(keeper), files))
         for file in files:
-            if not file.startswith(keeper):
+            if not file.startswith(keeper) and is_in_keeper:
                 print('delete', file)
                 removed_files.append(file)
                 os.remove(file)
