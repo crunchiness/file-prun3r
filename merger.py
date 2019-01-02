@@ -73,4 +73,4 @@ if __name__ == '__main__':
     for i, directory in enumerate(args.dir):
         files.append(list_files(directory, i))
     duplicates = find_duplicates(files)
-    # remove_duplicates(duplicates, args.dir[0])
+    remove_duplicates(duplicates, args.dir[0])
