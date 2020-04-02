@@ -54,7 +54,7 @@ def find_duplicates(files: List[Tuple[str, Dict[str, str]]]) -> Dict[str, List[s
     return file_dict_only_duplicates
 
 
-def remove_duplicates(duplicates: Dict[str, List[str]], keeper: str) -> None:
+def remove_duplicates(duplicates: Dict[str, List[str]], keeper: str, dry_run: bool = False) -> None:
     removed_files = []
     for hash, files in duplicates.items():
         is_in_keeper = any(map(lambda f: f.startswith(keeper), files))
@@ -62,17 +62,20 @@ def remove_duplicates(duplicates: Dict[str, List[str]], keeper: str) -> None:
             if not file.startswith(keeper) and is_in_keeper:
                 print('delete', file)
                 removed_files.append(file)
-                os.remove(file)
+                if not dry_run:
+                    os.remove(file)
     with open('removed.json', 'w') as f:
         json.dump(removed_files, f, indent=4, sort_keys=True)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--dry-run', dest='dry', default=False, action='store_true',
+                        help='don\'t actually remove anything')
     parser.add_argument('dir', nargs='+', help='directory', type=str)
     args = parser.parse_args()
     files = []
     for i, directory in enumerate(args.dir):
         files.append(list_files(directory, i))
     duplicates = find_duplicates(files)
-    remove_duplicates(duplicates, args.dir[0])
+    remove_duplicates(duplicates, args.dir[0], args.dry)
