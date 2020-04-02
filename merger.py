@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 import hashlib
-import os
 import json
+import os
+from typing import Dict, List, Tuple
 
 
-def md5(file_path):
+def md5(file_path: str) -> str:
     hash_md5 = hashlib.md5()
     with open(file_path, 'rb') as f:
         for chunk in iter(lambda: f.read(4096), b''):
@@ -13,7 +14,7 @@ def md5(file_path):
     return hash_md5.hexdigest()
 
 
-def list_files(directory, dir_number):
+def list_files(directory: str, dir_number: int) -> Tuple[str, Dict[str, str]]:
     cache_file_name = 'dir{}_cache.json'.format(dir_number)
     file_list = {}
     if os.path.isfile(cache_file_name):
@@ -30,7 +31,7 @@ def list_files(directory, dir_number):
     return directory, file_list
 
 
-def find_duplicates(files):
+def find_duplicates(files: List[Tuple[str, Dict[str, str]]]) -> Dict[str, List[str]]:
     file_dict_only_duplicates = {}
     duplicates_json_file_name = 'duplicates.json'
     if os.path.isfile(duplicates_json_file_name):
@@ -53,7 +54,7 @@ def find_duplicates(files):
     return file_dict_only_duplicates
 
 
-def remove_duplicates(duplicates, keeper):
+def remove_duplicates(duplicates: Dict[str, List[str]], keeper: str) -> None:
     removed_files = []
     for hash, files in duplicates.items():
         is_in_keeper = any(map(lambda f: f.startswith(keeper), files))
