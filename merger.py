@@ -54,12 +54,21 @@ def find_duplicates(files: List[Tuple[str, Dict[str, str]]]) -> Dict[str, List[s
     return file_dict_only_duplicates
 
 
-def remove_duplicates(duplicates: Dict[str, List[str]], keeper: str, dry_run: bool = False) -> None:
+def remove_duplicates(
+        duplicates: Dict[str, List[str]],
+        keeper: str,
+        keep_shortest: bool = False,
+        dry_run: bool = False
+) -> None:
     removed_files = []
     for hash, files in duplicates.items():
         is_in_keeper = any(map(lambda f: f.startswith(keeper), files))
+        shortest = min(files, key=len)
         for file in files:
-            if not file.startswith(keeper) and is_in_keeper:
+            if (
+                    (not file.startswith(keeper) and is_in_keeper) or
+                    (keep_shortest and file != shortest)
+            ):
                 print('delete', file)
                 removed_files.append(file)
                 if not dry_run:
@@ -78,4 +87,4 @@ if __name__ == '__main__':
     for i, directory in enumerate(args.dir):
         files.append(list_files(directory, i))
     duplicates = find_duplicates(files)
-    remove_duplicates(duplicates, args.dir[0], args.dry)
+    remove_duplicates(duplicates, args.dir[0], keep_shortest=len(args.dir) == 1, dry_run=args.dry)
