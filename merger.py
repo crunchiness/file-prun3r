@@ -6,12 +6,12 @@ import os
 from typing import Dict, List, Tuple
 
 
-def md5(file_path: str) -> str:
-    hash_md5 = hashlib.md5()
+def sha256(file_path: str) -> str:
+    hash_sha256 = hashlib.sha256()
     with open(file_path, 'rb') as f:
         for chunk in iter(lambda: f.read(4096), b''):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+            hash_sha256.update(chunk)
+    return hash_sha256.hexdigest()
 
 
 def list_files(directory: str, dir_number: int) -> Tuple[str, Dict[str, str]]:
@@ -25,7 +25,7 @@ def list_files(directory: str, dir_number: int) -> Tuple[str, Dict[str, str]]:
             for file in files:
                 file_path = os.path.join(subdir, file)
                 print('reading', file_path)
-                file_list[file_path] = md5(file_path)
+                file_list[file_path] = sha256(file_path)
         with open(cache_file_name, 'w') as f:
             json.dump(file_list, f, indent=4, sort_keys=True)
     return directory, file_list
